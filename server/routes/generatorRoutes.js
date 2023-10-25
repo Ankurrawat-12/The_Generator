@@ -32,9 +32,7 @@ router.route("/").post(async (req, res) => {
         result = JSON.parse(result);
         console.log(result);
         console.log("Result URL :- " + result.url);
-        console.log("Calling the fetchImageWithStatusCheck function");
         var image = await fetchImageWithStatusCheck(result.url);
-        console.log("Called the fetchImageWithStatusCheck function");
         console.log("Image URL :- " + image);
 
         res.status(200).json({ photo: image });
