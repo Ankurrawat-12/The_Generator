@@ -45,22 +45,18 @@ router.route("/").post(async (req, res) => {
 });
 
 async function fetchImageWithStatusCheck(url) {
+    let data;
     try {
-        console.log("fetching the response");
         const response = await fetch(url);
-        console.log("fetched the response " + response);
-
         if (response.ok) {
             const contentType = response.headers.get("content-type");
-
             if (contentType && contentType.includes("application/json")) {
-                const data = await response.json();
-                console.log("About to check the status code.");
+                data = await response.json();
 
                 if (data.Status === "Processing") {
                     console.log(`Status: ${data.Status}, ETA: ${data.ETA}`);
                     await new Promise(resolve => setTimeout(resolve, 5000));
-                    return fetchImageWithStatusCheck(url); // Return the result of the recursive call
+                    return fetchImageWithStatusCheck(url); 
                 } else {
                     const imageUrl = data.url;
                     console.log("Returning the url of the image");
@@ -68,13 +64,14 @@ async function fetchImageWithStatusCheck(url) {
                 }
             } else {
                 console.error("Response is not JSON.");
-                return null;
+                console.log("Returning the url of the image");
+                return url;
             }
         }
     } catch (error) {
         console.error("Error fetching and processing image:", error);
         console.log("Returning null");
-        return null;
+        return url;
     }
 }
 
