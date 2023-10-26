@@ -1,6 +1,7 @@
 import express from "express";
 import * as dotenv from "dotenv";
 import { OpenAI } from "openai";
+import fetch from "node-fetch";
 
 dotenv.config();
 
@@ -53,17 +54,17 @@ async function fetchImageWithStatusCheck(url) {
 
                 if (data.Status === "Processing") {
                     console.log(`Status: ${data.Status}, ETA: ${data.ETA}`);
-                    await new Promise(resolve => setTimeout(resolve, 5000));
-                    return fetchImageWithStatusCheck(url); 
+                    await new Promise((resolve) => setTimeout(resolve, 5000));
+                    return fetchImageWithStatusCheck(url);
                 } else {
                     const imageUrl = data.url;
                     console.log("Returning the url of the image");
-                    return imageUrl;
+                    return fetchAndConvertImageToBase64(imageUrl);
                 }
             } else {
                 console.error("Response is not JSON.");
                 console.log("Returning the url of the image");
-                return url;
+                return fetchAndConvertImageToBase64(url);
             }
         }
     } catch (error) {
@@ -73,5 +74,39 @@ async function fetchImageWithStatusCheck(url) {
     }
 }
 
+// async function fetchAndConvertImageToBase64(url) {
+//     try {
+//         const response = await fetch(url);
+//         if (response.ok) {
+//             const blob = await response.blob();
+//             const reader = new FileReader();
+//             return new Promise((resolve, reject) => {
+//                 reader.onload = () => {
+//                     const base64Image = reader.result;
+//                     resolve(base64Image);
+//                 };
+//                 reader.onerror = reject;
+//                 reader.readAsDataURL(blob);
+//             });
+//         }
+//     } catch (error) {
+//         console.error("Error fetching and converting image:", error);
+//         return null;
+//     }
+// }
+
+async function fetchAndConvertImageToBase64(url) {
+    try {
+        const response = await fetch(url);
+        if (response.ok) {
+            const buffer = await response.buffer();
+            const base64Image = buffer.toString("base64");
+            return base64Image;
+        }
+    } catch (error) {
+        console.error("Error fetching and converting image:", error);
+        return null;
+    }
+}
 
 export default router;
