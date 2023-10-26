@@ -34,7 +34,7 @@ router.route("/").post(async (req, res) => {
         console.log(result);
         console.log("Result URL :- " + result.url);
         var image = await fetchImageWithStatusCheck(result.url);
-        console.log("Image URL :- " + image);
+        // console.log("Image URL :- " + image);
 
         res.status(200).json({ photo: image });
     } catch (error) {
@@ -58,18 +58,18 @@ async function fetchImageWithStatusCheck(url) {
                     return fetchImageWithStatusCheck(url);
                 } else {
                     const imageUrl = data.url;
-                    console.log("Returning the url of the image");
+                    console.log("Converting the Image to b64 using the URL");
                     return fetchAndConvertImageToBase64(imageUrl);
                 }
             } else {
                 console.error("Response is not JSON.");
-                console.log("Returning the url of the image");
+                console.log("Converting the Image to b64 using the URL");
                 return fetchAndConvertImageToBase64(url);
             }
         }
     } catch (error) {
         console.error("Error fetching and processing image:", error);
-        console.log("Returning null");
+        console.log("Returning the url");
         return url;
     }
 }
@@ -101,6 +101,7 @@ async function fetchAndConvertImageToBase64(url) {
         if (response.ok) {
             const buffer = await response.buffer();
             const base64Image = buffer.toString("base64");
+            console.log("Returning the b64 Image");
             return base64Image;
         }
     } catch (error) {

@@ -13,11 +13,14 @@ const CreatePost = () => {
     });
     const [generatingImage, setGeneratingImage] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [disableGenerateButton, setDisableGenerateButton] = useState(true);
+    const [generatedPrompt, setGeneratedPrompt] = useState("");
 
     const generateImage = async () => {
         if (form.prompt) {
             try {
                 setGeneratingImage(true);
+                setDisableGenerateButton(true);
                 const response = await fetch(
                     "http://192.168.0.103:8080/api/v1/generator",
                     {
@@ -35,22 +38,55 @@ const CreatePost = () => {
                     // photo: data.photo,
                     photo: `data:image/jpeg;base64,${data.photo}`,
                 });
+                
+                setGeneratedPrompt(form.prompt);
+                
             } catch (error) {
                 alert(error.message);
-            }
-            finally {
+            } finally {
                 setGeneratingImage(false);
             }
-        }
-        else{
-            alert('please Enter a Prompt');
+        } else {
+            alert("please Enter a Prompt");
         }
     };
 
-    const handleSubmit = () => {};
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (form.prompt && form.photo) {
+            setLoading(true);
+            try {
+                const response = await fetch(
+                    "http://192.168.0.103:8080/api/v1/post",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(form),
+                    }
+                );
+
+                await response.json();
+                navigate("/");
+            } catch (error) {
+                alert(error);
+            } finally {
+                setLoading(false);
+            }
+        } else {
+            alert("Please enter a prompt and generate an image");
+        }
+    };
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+        console.log(form);
+        if (e.target.name === "prompt" && e.target.value !== generatedPrompt) {
+            setDisableGenerateButton(false);
+        } else {
+            setDisableGenerateButton(true);
+        }
     };
 
     const handleSurpriseMe = () => {
@@ -116,7 +152,8 @@ const CreatePost = () => {
                     <button
                         type="button"
                         onClick={generateImage}
-                        className="text-white bg-green-700 font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+                        disabled={disableGenerateButton}
+                        className="text-white disabled:opacity-50 bg-green-700 font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
                     >
                         {generatingImage
                             ? "Generating Image..."
