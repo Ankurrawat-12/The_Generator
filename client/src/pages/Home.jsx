@@ -23,7 +23,7 @@ const Home = () => {
             setLoading(true);
             try {
                 const response = await fetch(
-                    "http://192.168.0.103:8080/api/v1/post",
+                    "http://localhost:8080/api/v1/post",
                     {
                         method: "GET",
                         headers: {

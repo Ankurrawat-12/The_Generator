@@ -22,7 +22,7 @@ const CreatePost = () => {
                 setGeneratingImage(true);
                 setDisableGenerateButton(true);
                 const response = await fetch(
-                    "http://192.168.0.103:8080/api/v1/generator",
+                    "http://localhost:8080/api/v1/generator",
                     {
                         method: "POST",
                         headers: {
@@ -57,7 +57,7 @@ const CreatePost = () => {
             setLoading(true);
             try {
                 const response = await fetch(
-                    "http://192.168.0.103:8080/api/v1/post",
+                    "http://localhost:8080/api/v1/post",
                     {
                         method: "POST",
                         headers: {
